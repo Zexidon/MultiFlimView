@@ -119,11 +119,11 @@ else
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function print_figure(W,NamePrint,viewOption,comment)
-if isempty(W),
+if isempty(W)
     return
 end
 
-switch viewOption,
+switch viewOption
     case 1  % intensity
         ClMap=get(gcf,'Colormap');
         PrintFigureHn=figure;
@@ -140,7 +140,7 @@ switch viewOption,
     case 2  % gray level
         img=((W))/2^(14);
         imwrite(img,NamePrint);
-end;
+end
 
 
 % close(PrintFigureHn);
@@ -156,12 +156,12 @@ global IMG_Main;
 
 image=IMG_Main;
 rescaleOption=get(handles.rescaleSelection,'Value');
-if rescaleOption==1,
+if rescaleOption==1
     [ClLow,ClHigh]=rescale_figure(image);
 else
     ClLow=str2num(get(handles.rescaleMin,'String'));
     ClHigh=str2num(get(handles.rescaleMax,'String'));
-end;
+end
 ClipValues = [ClLow ClHigh];
 set(gca,'Clim',ClipValues);
 colorbar;
@@ -170,7 +170,7 @@ colorbar;
 function [Cl_Low,Cl_High]=rescale_figure(W)
 % Rescale the colormap of an image based on a rectangle
 
-if isempty(W),
+if isempty(W)
     return
 end
 
@@ -200,7 +200,7 @@ global IMG_Main;
 image=IMG_Main;
 numRect=str2num(get(handles.numSelection,'String'));
 optAverAoi=get(handles.FitAoiSelection,'Value');
-if optAverAoi==2,
+if optAverAoi==2
     firstCol=str2num(get(handles.fitAoiFirstCol,'String'));
     lastCol=str2num(get(handles.fitAoiLastCol,'String'));
     firstRow=str2num(get(handles.fitAoiFirstRow,'String'));
@@ -213,25 +213,25 @@ else
 end
 for (i=1:numRect)
     Buffer{i}=sprintf('%11.2f  +/- %8.2f (%6.2f%%)',average(i),stdDeviation(i),(stdDeviation(i)/average(i))*100);
-end;
+end
 msgbox(Buffer);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [Avg,Std]=average_figure(W,AverageNum,opt,firstCol,lastCol,firstRow,lastRow);
+function [Avg,Std]=average_figure(W,AverageNum,opt,firstCol,lastCol,firstRow,lastRow)
 % Rescale the colormap of an image based on a rectangle
 % Check the figure
-if isempty(W),
+if isempty(W)
     return
 end
 if opt==2
-    for i = 1:AverageNum,
+    for i = 1:AverageNum
         [Avg(i),Std(i)]=avfunction(W,opt,firstCol,lastCol,firstRow,lastRow);
     end
 else
-    for i = 1:AverageNum,
+    for i = 1:AverageNum
         [Avg(i),Std(i)]=avfunction(W,opt);
     end
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [AvM,Std]=avfunction(H,opt,firstCol,lastCol,firstRow,lastRow)
@@ -256,7 +256,7 @@ end
 n_pixel=(max(x)-min(x)+1)*(max(y)-min(y)+1);
 Area=H(min(y):max(y),min(x):max(x));
 Area=reshape(Area,1,n_pixel);
-Area(find(Area==nan))=0;
+Area(isnan(Area))=0;
 AvM=mean(Area);
 Std=std(Area);
 fprintf('Average = %11.2f  StdDev = %6.2f Ratio=%5.2f%% NumPixel= %d\n',AvM,Std,(Std/AvM)*100,n_pixel);
@@ -325,7 +325,7 @@ set(h,'Position',[0.2 0.95]);
 function  [avW,stdW]=hist_figure(W)
 % Calculate the image histogram
 % Check the figure
-if isempty(W),
+if isempty(W)
     return
 end
 figure;
@@ -343,7 +343,7 @@ function [x,y,handle]=select_rect(Option)
 % Select a rectange (to be used instead of ginput(2))
 [x y]=ginput(2);
 
-if Option==1,
+if Option==1
     xplot = [x(1) x(2) x(2) x(1) x(1)];
     yplot = [y(1) y(1) y(2) y(2) y(1)];
     hold on
@@ -380,7 +380,7 @@ if (x(2)-x(1))>(y(2)-y(1))
 else
     asse=round(y(1)):1:(round(y(1))+length(profilo)-1);
     textLabel=sprintf('Asse x');
-end;
+end
 handle=plot(asse,profilo','k-*');
 set(handle,'MarkerSize',3);
 xlabel(textLabel);
@@ -391,9 +391,9 @@ function ViewLstButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global DelayCellArray gain X TimeExp;
-for i=1:length(gain),
+for i=1:length(gain)
     fprintf('%s\t%5d\t%5d\t%6.3f\n',(DelayCellArray{i}),X(i),gain(i),TimeExp(i));
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % --- Executes on button press in LinLogButton.
@@ -405,7 +405,7 @@ function LinLogButton_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of LinLogButton
 axes(handles.plotAxes);
 
-if (get(hObject,'Value')==1),
+if (get(hObject,'Value')==1)
     set(gca,'YScale','linear');
     set(hObject,'String','Log');
 else
@@ -423,11 +423,11 @@ function NormRestoreButton_Callback(hObject, eventdata, handles)
 global X Y_Single Y_Single_std selectionNum;
 
 errorbarOn=get(handles.errorbarOn,'Value');
-if (get(hObject,'Value')==1),
-    for i=1:selectionNum,
+if (get(hObject,'Value')==1)
+    for i=1:selectionNum
         Y_SingleNormalized(i,:)=Y_Single(i,:)/max(Y_Single(i,:));
         Y_Single_stdNormalized(i,:)=Y_Single_std(i,:)/max(Y_Single(i,:));
-    end;
+    end
     axes(handles.plotAxes),cla;
     plotData(X,Y_SingleNormalized,Y_Single_stdNormalized,selectionNum,errorbarOn);    
     set(hObject,'String','Restore');
@@ -435,7 +435,7 @@ else
     axes(handles.plotAxes),cla;
     plotData(X,Y_Single,Y_Single_std,selectionNum,errorbarOn);
     set(hObject,'String','Normalize');
-end;
+end
 x1=str2num(get(handles.plot_XMin,'String'));
 x2=str2num(get(handles.plot_XMax,'String'));
 set(gca,'Xlim',[x1 x2]);
@@ -481,19 +481,19 @@ switch FileType
 end
 
 currentDir=get(handles.pathString,'String');
-if isempty(currentDir),
+if isempty(currentDir)
     currentDir=pwd;
-end;
+end
 
 iml_or_lst=get(handles.iml_or_lst,'Value');
 if iml_or_lst==0
-    [filename, pathname, output]=uigetfile('*.lst','Load image name');
+    [filename, pathname, output]=uigetfile('*.lst','Load image name', currentDir);
 else
-    [filename, pathname, output]=uigetfile(EXTENSION,'Load image name');
-end;
-if output==0,
+    [filename, pathname, output]=uigetfile(EXTENSION,'Load image name', currentDir);
+end
+if output==0
     return;
-end;
+end
 % set pathname
 set(handles.pathString, 'String',pathname);
 % set filename
@@ -510,13 +510,13 @@ function SelectBkgFile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 currentDir=get(handles.pathString,'String');
-if isempty(currentDir),
+if isempty(currentDir)
     currentDir=pwd;
-end;
+end
 [bkgFilename, bkgPathname, output]=uigetfile('*.lst','Load BKG image name');
-if output==0,
+if output==0
     return;
-end;
+end
 % set pathname
 set(handles.bkgPathString, 'String',bkgPathname);
 % set filename
@@ -581,26 +581,26 @@ if  iml_or_lst==0
         h=findobj(gcbf,'Tag','PanelMain');
         set(h,'Pointer','Arrow');
         return;
-    end;
+    end
     if (EXTENSION=='.imh')
-        for i=1:DelayNum,
+        for i=1:DelayNum
             FileNameCellArray{i}=[pathName fileName DelayCellArray{i} EXTENSION];
         end
     elseif (EXTENSION=='.imq')
-        for i=1:DelayNum,
+        for i=1:DelayNum
             FileNameCellArray{i}=[pathName fileName(1:end-1) DelayCellArray{i} fileName(end) EXTENSION];
         end
     end
 else
     DelayNum=1;
     FileNameCellArray{1}=[pathName fileName EXTENSION];
-end;
+end
 
 % Check for file existence
 FileExist = 1;
-for i=1:(size(FileNameCellArray,2)),
+for i=1:(size(FileNameCellArray,2))
     ExistTest = exist(FileNameCellArray{i});
-    if ~ExistTest,
+    if ~ExistTest
         Buffer = sprintf('File %s not found',FileNameCellArray{i});
         warndlg(Buffer);
         %       output_text(Buffer);
@@ -664,26 +664,26 @@ if BkgFromFileON
             h=findobj(gcbf,'Tag','PanelMain');
             set(h,'Pointer','Arrow');
             return;
-        end;
+        end
         if (EXTENSION=='.imh')
-            for i=1:BkgDelayNum,
+            for i=1:BkgDelayNum
                 BkgFileNameCellArray{i}=[bkgPathName bkgFileName BkgDelayCellArray{i} EXTENSION];
             end
         elseif (EXTENSION=='.imq')
-            for i=1:BkgDelayNum,
+            for i=1:BkgDelayNum
                 BkgFileNameCellArray{i}=[bkgPathName bkgFileName(1:end-1) BkgDelayCellArray{i} bkgFileName(end) EXTENSION];
             end
         end
     else
         BkgDelayNum=1;
         BkgFileNameCellArray{1}=[bkgPathName bkgFileName EXTENSION];
-    end;
+    end
     
     % Check for file existence
     FileExist = 1;
-    for i=1:(size(BkgFileNameCellArray,2)),
+    for i=1:(size(BkgFileNameCellArray,2))
         ExistTest = exist(BkgFileNameCellArray{i});
-        if ~ExistTest,
+        if ~ExistTest
             Buffer = sprintf('File %s not found',BkgFileNameCellArray{i});
             warndlg(Buffer);
             %       output_text(Buffer);
@@ -772,7 +772,7 @@ XZero=X(indexZero);
 
 if  iml_or_lst==0
     X=X-XZero;
-end;
+end
 
 switch Timescale
     case 1 % nanosecond
@@ -927,7 +927,7 @@ set(handles.textGain,'String',num2str(gain(index_Zero)));
 if exist('IMG_Main','var')
     clear global IMG_Main;
     global IMG_Main;
-end;
+end
 IMG_Main=Y(:,:,index_Zero);
 
 viewOption=get(handles.viewOpt,'Value');
@@ -1003,19 +1003,19 @@ axis image;
 function [i]=findIndex(value,vector)
 temp1=find(vector <= value);
 temp2=find(vector > value);
-if ~isempty(temp1),
-    if ~isempty(temp2),
+if ~isempty(temp1)
+    if ~isempty(temp2)
         if ((value-vector(temp1(end))) < (vector(temp2(1))-value))
             i=temp1(end);
         else
             i=temp2(1);
-        end;
+        end
     else
         i=temp1(end);
-    end;
+    end
 else
     i=temp2(1);
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1032,16 +1032,16 @@ global firstAOIRow lastAOIRow firstAOICol lastAOICol;
 
 
 
-if exist('Y_Single'),
+if exist('Y_Single')
     clear global Y_Single;
     global Y_Single;
-end;
+end
 
 axes(handles.mainAxes);
 
 selectionNum=str2num(get(handles.numSelection,'String'));
 datacursormode on;
-for i=1:selectionNum,
+for i=1:selectionNum
         rect=getrect;
         rect=round(rect);
         hRect(i)=rectangle('Position',rect);
@@ -1081,7 +1081,7 @@ else
     Y_THR=Y;
 end
 
-for i=1:selectionNum,
+for i=1:selectionNum
     NumPoint(i) = (lastCol(i)-firstCol(i)+1) * (lastRow(i)-firstRow(i)+1);
     temp=Y_THR(firstRow(i):lastRow(i),firstCol(i):lastCol(i),:);
     vettore_m=squeeze(nanmean(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)])));
@@ -1089,7 +1089,7 @@ for i=1:selectionNum,
 
     vettore_s=squeeze(nanstd(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)])));
     Y_Single_std(i,:)=vettore_s;
-end;
+end
 axes(handles.plotAxes);
 cla;
 errorbarOn=get(handles.errorbarOn,'Value');
@@ -1098,10 +1098,10 @@ plotData(X,Y_Single,Y_Single_std,selectionNum,errorbarOn);
 Y_SingleNormalized=zeros(size(Y_Single));
 Y_Single_stdNormalized=zeros(size(Y_Single));
 
-for i=1:selectionNum,
+for i=1:selectionNum
     Y_SingleNormalized(i,:)=Y_Single(i,:)/max(Y_Single(i,:));
     Y_Single_stdNormalized(i,:)=Y_Single_std(i,:)/max(Y_Single(i,:));
-end;
+end
 
 figure,
 subplot(2,1,1)
@@ -1134,7 +1134,7 @@ while sw
     if (x>0)&(y>0)&(x<RowLength)&(y<ColLength)
         sw=0;
     end
-end;
+end
 c1=min(x);
 c2=max(x);
 r1=min(y);
@@ -1153,7 +1153,7 @@ MarkerColor(6,:)=[1 1 0];
 % Plot the time behaviour(s)
 Massimo=max(max(data));
 Minimo=min(min(data));
-for i=1:num,
+for i=1:num
     if errorbarOn
         errorbar(asse,data(i,:),dataStd(i,:),'LineStyle','none','Marker','o','MarkerSize', 2,'Color',MarkerColor(i,:),'MarkerFaceColor',MarkerColor(i,:));
     else
@@ -1332,19 +1332,19 @@ global SingleFit SingleFitStop;
 if exist('Y_Single')
     clear global Y_Single;
     global Y_Single;
-end;
+end
 
 Y_Single=zeros(1,size(Y,3));
 SingleFit=get(hObject,'Value');
-if SingleFit,
+if SingleFit
     SingleFitStop=0;
     selectionNum=1;
     [firstCol,lastCol,firstRow,lastRow]=getSingleData;
     NumPoint = (lastCol-firstCol+1) * (lastRow-firstRow+1);
     temp=sum(sum(Y(firstRow:lastRow,firstCol:lastCol,:),1),2)/NumPoint;
-    for (i=1:size(temp,3)),
+    for (i=1:size(temp,3))
         Y_Single(i)=temp(1,1,i);
-    end;
+    end
     axes(handles.plotAxes),cla;
     plotData(X,Y_Single,0,selectionNum,0);
     x1=str2num(get(handles.plot_XMin,'String'));
@@ -1356,7 +1356,7 @@ if SingleFit,
     set(gca,'Ylim',[y1 y2]);
 else
     SingleFitStop=1;
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % --- Executes on button press in FitImage.
@@ -1379,21 +1379,21 @@ global ThresholdON;
 if exist('Y_Image')
     clear global Y_Image;
     global Y_Image;
-end;
+end
 
 ImageFit=get(hObject,'Value');
-if ImageFit,
+if ImageFit
     ImageFitStop=0;
     
     optAoi=get(handles.FitAoiSelection,'Value');
-    if optAoi==1,
+    if optAoi==1
         [firstCol,lastCol,firstRow,lastRow]=getSingleData;
-    elseif optAoi==2,
+    elseif optAoi==2
         firstCol=str2num(get(handles.fitAoiFirstCol,'String'));
         lastCol=str2num(get(handles.fitAoiLastCol,'String'));
         firstRow=str2num(get(handles.fitAoiFirstRow,'String'));
         lastRow=str2num(get(handles.fitAoiLastRow,'String'));
-    elseif optAoi==3,
+    elseif optAoi==3
         firstCol=1;
         lastCol=RowLength;
         firstRow=1;
@@ -1425,11 +1425,11 @@ if ImageFit,
     IMG=Y_Image(:,:,index_Zero);
     
     viewOption=get(handles.viewOpt,'Value');
-    switch viewOption,
+    switch viewOption
         case 1  % intensity
         case 2  % gray level
             IMG=IMG/gain_n(index_Zero)*TimeExp(index_Zero);
-    end;
+    end
     
     if ThresholdON
         threshold=str2num(get(handles.ThresholdValue,'String'));
@@ -1446,7 +1446,7 @@ if ImageFit,
         for i=1:size(Y_Image,3)
             Y_Image(:,:,i)=imfilter(Y_Image(:,:,i),fspecial('gaussian',[FilterSize FilterSize],0.5));
         end
-    end;
+    end
 
 
     aoi1=size(Y_Image,1);
@@ -1457,7 +1457,7 @@ if ImageFit,
 
 else
     ImageFitStop=1;
-end;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in FitImgMonoExp.
@@ -1562,7 +1562,7 @@ if FilterSize>0
     for i=1:size(Y_Image,3)        
         Y_Image(:,:,i)=imfilter(Y_Image(:,:,i),fspecial('gaussian',[FilterSize FilterSize],0.5));        
     end
-end;
+end
 
 
 
@@ -1572,7 +1572,7 @@ SizeUtil=aoi1*aoi2;
 Y_Image=reshape(Y_Image,SizeUtil,size(Y_Image,3))';
 ThMask_Vector=reshape(ThMaskNaN,SizeUtil,1);
 
-if exist('Amp_Image'),
+if exist('Amp_Image')
     Amp_Image=zeros(aoi1,aoi2);
     Tau_Image=zeros(aoi1,aoi2);
     beta_Image=zeros(aoi1,aoi2);
@@ -1749,7 +1749,7 @@ function GuessChoice_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns GuessChoice contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from GuessChoice
 guessChoice=get(hObject,'Value');
-switch guessChoice,
+switch guessChoice
     case 1  % Stripping
         set(handles.Tau1Fix,'Visible','Off');
         set(handles.Tau2Fix,'Visible','Off');
@@ -1780,7 +1780,7 @@ switch guessChoice,
         set(handles.Strip2_On,'Visible','Off');
         set(handles.Strip3_On,'Visible','Off');
         set(handles.CompleteStrip,'Visible','Off');
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in Strip1_On.
 function Strip1_On_Callback(hObject, eventdata, handles)
@@ -1805,7 +1805,7 @@ global aoi1 aoi2;
 global Amp1_Image Tau1_Image;
 
 strip1On=get(hObject,'Value');
-if strip1On,
+if strip1On
     stripPercOn=get(handles.stripPercOn,'Value');
     if stripPercOn
         lowPerc=str2num(get(handles.Strip1_L_perc,'String'));
@@ -1817,7 +1817,7 @@ if strip1On,
         indexLast=findIndex(high,X);
         XStripped=X(indexFirst:indexLast);
     end
-    if SingleFit,
+    if SingleFit
         if stripPercOn
             indexZero=findIndex(0,X);
             zeroIntensity=Y_Single(indexZero);
@@ -1828,7 +1828,7 @@ if strip1On,
             XStripped=X(indexFirst:indexLast);
         end
         PlotFigureHn=findobj('Tag','FigurePlot');
-        if isempty(PlotFigureHn),
+        if isempty(PlotFigureHn)
             PlotFigureHn=figure(plot_figure_ns);
         else
             figure(PlotFigureHn);
@@ -1841,10 +1841,10 @@ if strip1On,
         set(h.Tau3Init,'String','0');
         set(h.A3Init,'String','0');
         set(h.ChiInit,'String','0');
-        if exist('Amp'),
+        if exist('Amp')
             Amp=zeros(1,3);
             Tau=zeros(1,3);
-        end;
+        end
         YStripped=Y_Single(indexFirst:indexLast);
         [Amp(1),Tau(1)]=Stripping(XStripped,YStripped);
         yFit=Amp(1)*Tau(1)*exp(-X/Tau(1))*(1-exp(-gate/Tau(1)));
@@ -1860,7 +1860,7 @@ if strip1On,
         TauString=sprintf('%6.2f',Tau(1));
         ChiString=sprintf('%5.3f',ChiSquared);
         PlotFigureHn=findobj('Tag','FigurePlot');
-        if isempty(PlotFigureHn),
+        if isempty(PlotFigureHn)
             PlotFigureHn=figure(plot_figure_ns);
         else
             figure(PlotFigureHn);
@@ -1871,7 +1871,7 @@ if strip1On,
         set(h.ChiInit,'String',ChiString);
     elseif ImageFit
         ImageFigureHn=findobj('Tag','FigureFitLinImage');
-        if isempty(ImageFigureHn),
+        if isempty(ImageFigureHn)
             ImageFigureHn=figure(fit_image_ns);
         else
             figure(ImageFigureHn);
@@ -1889,15 +1889,15 @@ if strip1On,
         axes(findobj(ImageFigureHn,'Tag','axes6'));
         imagesc(zeros(aoi1,aoi2));
 
-        if exist('Amp_Image'),
+        if exist('Amp_Image')
             Amp_Image=zeros(aoi1,aoi2);
             Tau_Image=zeros(aoi1,aoi2);
-        end;
+        end
         YStripped_Image=Y_Image(indexFirst:indexLast,:);
         [Amp_v,Tau_v]=Stripping_Image(XStripped,YStripped_Image);
-        for(i=1:length(X)),
+        for(i=1:length(X))
             Y_temp(i,:)=Amp_v.*Tau_v.*(1-exp(-gate./Tau_v)).*exp(-X(i)./Tau_v);
-        end;
+        end
         yFit=Y_temp;
         Y_Image_NoStrip1=Y_Image;
         Y_Image=Y_Image-yFit;
@@ -1921,12 +1921,12 @@ if strip1On,
         figure;
         imagesc(Amp1_Image), title('Amp1');
         colorbar;
-    end;
+    end
 else
     if SingleFitStop==1
         Y_Image=Y_Image_NoStrip1;
         ImageFigureHn=findobj('Tag','FigureFitImage');
-        if isempty(ImageFigureHn),
+        if isempty(ImageFigureHn)
             ImageFigureHn=figure(fit_image_ns);
         else
             figure(ImageFigureHn);
@@ -1940,8 +1940,8 @@ else
         axes(handles.plotAxes),cla;
         plotData(X,Y_Single,0,1,0);
         axes(handles.residAxes),cla;
-    end;
-end;
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in Strip2_On.
 function Strip2_On_Callback(hObject, eventdata, handles)
@@ -1963,13 +1963,13 @@ global ThMask;
 global aoi1 aoi2;
 
 strip2On=get(hObject,'Value');
-if strip2On,
+if strip2On
     low=str2num(get(handles.Strip2_L,'String'));
     high=str2num(get(handles.Strip2_H,'String'));
     indexFirst=findIndex(low,X);
     indexLast=findIndex(high,X);
     XStripped=X(indexFirst:indexLast);
-    if SingleFit,
+    if SingleFit
         YStripped=Y_Single(indexFirst:indexLast);
         [Amp(2),Tau(2)]=Stripping(XStripped,YStripped);
         yFit=Amp(2)*Tau(2)*exp(-X/Tau(2))*(1-exp(-gate/Tau(2)));
@@ -1982,7 +1982,7 @@ if strip2On,
         axes(handles.residAxes),cla;
         plotResidual(X,Resid,indexFirst,indexLast,1);
         PlotFigureHn=findobj('Tag','FigurePlot');
-        if isempty(PlotFigureHn),
+        if isempty(PlotFigureHn)
             PlotFigureHn=figure(plot_figure_ns);
         else
             figure(PlotFigureHn);
@@ -1997,9 +1997,9 @@ if strip2On,
     elseif ImageFit
         YStripped_Image=Y_Image(indexFirst:indexLast,:);
         [Amp_v,Tau_v]=Stripping_Image(XStripped,YStripped_Image);
-        for(i=1:length(X)),
+        for(i=1:length(X))
             Y_temp(i,:)=Amp_v.*Tau_v.*(1-exp(-gate./Tau_v)).*exp(-X(i)./Tau_v);
-        end;
+        end
         yFit=Y_temp;
         Y_Image_NoStrip2=Y_Image;
         Y_Image=Y_Image-yFit;
@@ -2021,12 +2021,12 @@ if strip2On,
         figure;
         imagesc(Amp2_Image), title('Amp2');
         colorbar;
-    end;
+    end
 else
     if SingleFitStop==1
         Y_Image=Y_Image_NoStrip2;
         ImageFigureHn=findobj('Tag','FigureFitImage');
-        if isempty(ImageFigureHn),
+        if isempty(ImageFigureHn)
             ImageFigureHn=figure(fit_image_ns);
         else
             figure(ImageFigureHn);
@@ -2040,8 +2040,8 @@ else
         axes(handles.plotAxes),cla;
         plotData(X,Y_Single,0,1,0);
         axes(handles.residAxes),cla;
-    end;
-end;
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in Strip3_On.
 function Strip3_On_Callback(hObject, eventdata, handles)
@@ -2065,13 +2065,13 @@ global aoi1 aoi2;
 
 
 strip3On=get(hObject,'Value');
-if strip3On,
+if strip3On
     low=str2num(get(handles.Strip3_L,'String'));
     high=str2num(get(handles.Strip3_H,'String'));
     indexFirst=findIndex(low,X);
     indexLast=findIndex(high,X);
     XStripped=X(indexFirst:indexLast);
-    if SingleFit,
+    if SingleFit
         YStripped=Y_Single(indexFirst:indexLast);
         [Amp(3),Tau(3)]=Stripping(XStripped,YStripped);
         yFit=Amp(3)*Tau(3)*exp(-X/Tau(3))*(1-exp(-gate/Tau(3)));
@@ -2084,7 +2084,7 @@ if strip3On,
         axes(handles.residAxes),cla;
         plotResidual(X,Resid,indexFirst,indexLast,1);
         PlotFigureHn=findobj('Tag','FigurePlot');
-        if isempty(PlotFigureHn),
+        if isempty(PlotFigureHn)
             PlotFigureHn=figure(plot_figure_ns);
         else
             figure(PlotFigureHn);
@@ -2100,9 +2100,9 @@ if strip3On,
     elseif ImageFit
         YStripped_Image=Y_Image(indexFirst:indexLast,:);
         [Amp_v,Tau_v]=Stripping_Image(XStripped,YStripped_Image);
-        for(i=1:length(X)),
+        for(i=1:length(X))
             Y_temp(i,:)=Amp_v.*Tau_v.*(1-exp(-gate./Tau_v)).*exp(-X(i)./Tau_v);
-        end;
+        end
         yFit=Y_temp;
         Y_Image_NoStrip3=Y_Image;
         Y_Image=Y_Image-yFit;
@@ -2124,12 +2124,12 @@ if strip3On,
         figure
         imagesc(Amp3_Image), title('Amp3');
         colorbar;
-    end;
+    end
 else
     if SingleFitStop==1
         Y_Image=Y_Image_NoStrip3;
         ImageFigureHn=findobj('Tag','FigureFitImage');
-        if isempty(ImageFigureHn),
+        if isempty(ImageFigureHn)
             ImageFigureHn=figure(fit_image_ns);
         else
             figure(ImageFigureHn);
@@ -2143,8 +2143,8 @@ else
         axes(handles.plotAxes),cla;
         plotData(X,Y_Single,0,1,0);
         axes(handles.residAxes),cla;
-    end;
-end;
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in CompleteStrip.
@@ -2171,8 +2171,8 @@ if stripPercOn
 else
     high=str2num(get(handles.Strip1_H,'String'));
     indexLast=findIndex(high,X);
-    if (get(handles.Strip3_On,'Value')==0),
-        if (get(handles.Strip2_On,'Value')==0),
+    if (get(handles.Strip3_On,'Value')==0)
+        if (get(handles.Strip2_On,'Value')==0)
             low=str2num(get(handles.Strip1_L,'String'));
             numTau=1;
         else
@@ -2182,10 +2182,10 @@ else
     else
         low=str2num(get(handles.Strip3_L,'String'));
         numTau=3;
-    end;
+    end
     indexFirst=findIndex(low,X);
-end;
-if SingleFit,
+end
+if SingleFit
     Y_Single=Y_Single_NoStrip1;
     if stripPercOn
         indexZero=findIndex(0,X);
@@ -2198,9 +2198,9 @@ if SingleFit,
         numTau=1;
     end
     yFit=zeros(1,indexLast-indexFirst+1);
-    for(i=1:numTau),
+    for(i=1:numTau)
         yFit=yFit+Amp(i)*Tau(i)*exp(-X(indexFirst:indexLast)/Tau(i))*(1-exp(-gate/Tau(i)));
-    end;
+    end
     ChiSquared=(norm((Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast)));
     Resid=(Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast);
     axes(handles.plotAxes),cla;
@@ -2209,7 +2209,7 @@ if SingleFit,
     plotResidual(X,Resid,indexFirst,indexLast,2);
     AmpRel=Amp./sum(Amp)*100;
     PlotFigureHn=findobj('Tag','FigurePlot');
-    if isempty(PlotFigureHn),
+    if isempty(PlotFigureHn)
         PlotFigureHn=figure(plot_figure_ns);
     else
         figure(PlotFigureHn);
@@ -2274,7 +2274,7 @@ elseif ImageFit
         set(gca,'Clim',[0 100]);
         colorbar;
     end
-end;
+end
 set(handles.Strip1_On,'Value',0);
 set(handles.Strip2_On,'Value',0);
 set(handles.Strip3_On,'Value',0);
@@ -2288,7 +2288,7 @@ TAU=(DelayNum*sum(X.*log(Y))-sum(X)*sum(log(Y)))/den;
 TAU=-1./TAU;
 % Calculate the Amplitude taking the average of the solutions of all the linear equations
 A= zeros(size(TAU));
-for f=1:DelayNum,
+for f=1:DelayNum
     A = A+Y(f).*(exp(X(f)/TAU))/(TAU*(1-exp(-gate/TAU)));
 end
 A = A./DelayNum;
@@ -2302,20 +2302,20 @@ TAU=(DelayNum*sum(diag(X)*log(Y))-sum(X)*sum(log(Y)))/den;
 TAU=-1./TAU;
 % Calculate the Amplitude taking the average of the solutions of all the linear equations
 A= zeros(size(TAU));
-for f=1:DelayNum,
+for f=1:DelayNum
     A = A+Y(f,:).*(exp(X(f)./TAU))./(TAU.*(1-exp(-gate./TAU)));
 end
 A = A./DelayNum;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function plotFittedData(asse,data,dataFit,i1,i2,resto);
+function plotFittedData(asse,data,dataFit,i1,i2,resto)
 
 Massimo=max(max(data));
 Minimo=min(min(data));
-if nargin==6,
+if nargin==6
     semilogy(asse,data,'bx',asse,dataFit,'r-',asse,resto,'kx'), hold on;
 else
     semilogy(asse,data,'bx',asse(i1:i2),dataFit,'r-'), hold on;
-end;
+end
 axis([asse(1) asse(length(asse)) Minimo Massimo]);
 Yline=Minimo:(Massimo-Minimo)/1000:Massimo;
 asseStart=asse(i1)*ones(1,length(Yline));
@@ -2344,7 +2344,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function plotResidual(asse,residual,i1,i2,flag);
+function plotResidual(asse,residual,i1,i2,flag)
 
 hold on;
 if flag==1
@@ -2355,7 +2355,7 @@ else
     plot(asse,0,'k',asse(i1:i2),residual,'-b');
     Massimo=max(max(residual))+0.1;
     Minimo=min(min(residual))-0.1;
-end;
+end
 
 set(gca,'YLim',[Minimo Massimo]);
 
@@ -2388,10 +2388,10 @@ global SingleFit;
 global Amp Tau;
 global gate;
 
-if exist('Amp'),
+if exist('Amp')
     Amp=zeros(1,3);
     Tau=zeros(1,3);
-end;
+end
 tauInput(1)=str2num(get(handles.Tau1Fix,'String'));
 temp=str2num(get(handles.Tau2Fix,'String'));
 if isempty(temp)
@@ -2406,13 +2406,13 @@ else
         numTau=3;
         tauInput(3)=temp;
     end
-end;
+end
 low=str2num(get(handles.fitSingle_r1,'String'));
 high=str2num(get(handles.fitSingle_r2,'String'));
 indexFirst=findIndex(low,X);
 indexLast=findIndex(high,X);
 XTauFix=X(indexFirst:indexLast);
-if SingleFit,
+if SingleFit
     YTauFix=interp1(XTauFix,Y_Single(indexFirst:indexLast),XTauFix(1):1:XTauFix(end));
     XTauFix=XTauFix(1):1:XTauFix(end);
     [Amp,Tau]=TauFix(XTauFix,YTauFix,tauInput,numTau);
@@ -2421,9 +2421,9 @@ if SingleFit,
         Tau(i)=0;
     end
     yFit=zeros(1,indexLast-indexFirst+1);
-    for(i=1:numTau),
+    for(i=1:numTau)
         yFit=yFit+Amp(i)*Tau(i)*exp(-X(indexFirst:indexLast)/Tau(i))*(1-exp(-gate/Tau(i)));
-    end;
+    end
     ChiSquared=(norm((Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast)));
     Resid=(Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast);
     axes(handles.plotAxes),cla;
@@ -2431,7 +2431,7 @@ if SingleFit,
     axes(handles.residAxes),cla;
     plotResidual(X,Resid,indexFirst,indexLast,2);
     PlotFigureHn=findobj('Tag','FigurePlot');
-    if isempty(PlotFigureHn),
+    if isempty(PlotFigureHn)
         PlotFigureHn=figure(plot_figure_ns);
     else
         figure(PlotFigureHn);
@@ -2458,14 +2458,14 @@ if SingleFit,
     set(h.A3RelInit,'String',ARelString);
     ChiString=sprintf('%5.3f',ChiSquared);
     set(h.ChiInit,'String',ChiString);
-end;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A,TAU]=TauFix(X,Y,tauIn,numTau);
+function [A,TAU]=TauFix(X,Y,tauIn,numTau)
 global gate;
 
-for(i=1:numTau),
+for(i=1:numTau)
     C(i,:)=(tauIn(i).*exp(-X/tauIn(i)).*(1-exp(-gate./tauIn(i)))).*ones(size(X));
-end;
+end
 
 TolX=10*max(size(C))*norm(C,1)*eps,
 options1 = optimset('TolX',TolX);
@@ -2504,11 +2504,11 @@ indexFirst=findIndex(low,X);
 indexLast=findIndex(high,X);
 XNonLin=X(indexFirst:indexLast);
 
-if SingleFit,
-    if exist('AmpFitted'),
+if SingleFit
+    if exist('AmpFitted')
         AmpFitted=zeros(1,3);
         TauFitted=zeros(1,3);
-    end;
+    end
     indexZero=findIndex(0,X);
     zeroIntensity=Y_Single(indexZero);
     %interp at 1 ns step
@@ -2535,7 +2535,7 @@ if SingleFit,
             YNonLin=YNonLin;
             [BetaFitted, TauKWW, success]=stretchExp(XNonLin,YNonLin,scalingFactor,Tau(1),FitDisplayOn);
             numTau=1;
-    end;
+    end
     for (i=(numTau+1):MAX_NUM_TAU)
         AmpFitted(i)=0;
         TauFitted(i)=0;
@@ -2550,9 +2550,9 @@ if SingleFit,
         TauFitted(1)=(TauKWW*gamma(1/BetaFitted))/BetaFitted;
         AmpFitted(1)=1;
     else
-        for(i=1:numTau),
+        for(i=1:numTau)
             yFit=yFit+AmpFitted(i)*TauFitted(i)*exp(-X(indexFirst:indexLast)/TauFitted(i))*(1-exp(-gate/TauFitted(i)));
-        end;
+        end
     end
     ChiSquared=(norm((Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast)));
     Resid=(Y_Single(indexFirst:indexLast)-yFit)./Y_Single(indexFirst:indexLast);
@@ -2564,7 +2564,7 @@ if SingleFit,
     h=findobj(gcbf,'Tag','PanelMain');
     set(h,'Pointer','Arrow');
     PlotFigureHn=findobj('Tag','FigurePlot');
-    if isempty(PlotFigureHn),
+    if isempty(PlotFigureHn)
         PlotFigureHn=figure(plot_figure_ns);
     else
         figure(PlotFigureHn);
@@ -2614,7 +2614,7 @@ elseif ImageFit
             global Amp1_Fitted_Image Amp2_Fitted_Image Amp3_Fitted_Image Tau1_Fitted_Image Tau2_Fitted_Image Tau3_Fitted_Image ErrMask success_Image;
             warning off MATLAB:divideByZero;
 
-            for q=1:sizeUtil,
+            for q=1:sizeUtil
                 if ThMask(q)
                     YNonLin_interp=interp1(XNonLin,YNonLin_Image(:,q),XNonLin_interp);
                     [Amp1_Fitted_Image(q),Amp2_Fitted_Image(q),Tau1_Fitted_Image(q),Tau2_Fitted_Image(q),success_Image(q)]=biExpImage(XNonLin_interp,YNonLin_interp,Amp1_Image(q),Tau1_Image(q),Amp2_Image(q),Tau2_Image(q),scalingFactor);
@@ -2624,11 +2624,11 @@ elseif ImageFit
                     Amp2_Fitted_Image(q)=0.0;
                     Tau2_Fitted_Image(q)=0.0;
                     success_Image(q)=0;
-                end;
-                if (mod(q,round(sizeUtil/10))==0),
+                end
+                if (mod(q,round(sizeUtil/10))==0)
                     fprintf(' Calculating non lin biexp... %d %%\n',q*100/(sizeUtil));
                 end
-            end;
+            end
 
             Amp1_Fitted_Image=reshape(Amp1_Fitted_Image,aoi1,aoi2);
             Tau1_Fitted_Image=reshape(Tau1_Fitted_Image,aoi1,aoi2);
@@ -2648,7 +2648,7 @@ elseif ImageFit
             global Amp1_Fitted_Image Amp2_Fitted_Image Amp3_Fitted_Image Tau1_Fitted_Image Tau2_Fitted_Image Tau3_Fitted_Image ErrMask success_Image;
             warning off MATLAB:divideByZero;
 
-            for q=1:sizeUtil,
+            for q=1:sizeUtil
                 if ThMask(q)
                     YNonLin_interp=interp1(XNonLin,YNonLin_Image(:,q),XNonLin_interp);
                     [Amp1_Fitted_Image(q),Amp2_Fitted_Image(q),Amp3_Fitted_Image(q),Tau1_Fitted_Image(q),Tau2_Fitted_Image(q),Tau3_Fitted_Image(q),success_Image(q)]=triExpImage(XNonLin_interp,YNonLin_interp,Amp1_Image(q),Tau1_Image(q),Amp2_Image(q),Tau2_Image(q),Amp3_Image(q),Tau3_Image(q),scalingFactor);
@@ -2660,11 +2660,11 @@ elseif ImageFit
                     Amp3_Fitted_Image(q)=0.0;
                     Tau3_Fitted_Image(q)=0.0;
                     success_Image(q)=0;
-                end;
-                if (mod(q,round(sizeUtil/10))==0),
+                end
+                if (mod(q,round(sizeUtil/10))==0)
                     fprintf(' Calculating non lin triexp... %d %%\n',q*100/(sizeUtil));
                 end
-            end;
+            end
             Amp1_Fitted_Image=reshape(Amp1_Fitted_Image,aoi1,aoi2);
             Tau1_Fitted_Image=reshape(Tau1_Fitted_Image,aoi1,aoi2);
             Amp2_Fitted_Image=reshape(Amp2_Fitted_Image,aoi1,aoi2);
@@ -2676,7 +2676,7 @@ elseif ImageFit
             Amp3Rel_Fitted_Image=Amp3_Fitted_Image./(Amp1_Fitted_Image+Amp2_Fitted_Image+Amp3_Fitted_Image)*100;
             warning on MATLAB:divideByZero;
             success_Image=reshape(success_Image,aoi1,aoi2);
-    end;
+    end
     h=findobj(gcbf,'Tag','PanelMain');
     set(h,'Pointer','Arrow');
     %     NonLinImageFigureHn=findobj('Tag','FigureFitNonLinImage');
@@ -2732,10 +2732,10 @@ elseif ImageFit
 %             imagesc(success_Image);
 %             colorbar;
         end
-    end;
-end;
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A, TAU, exitflag]=biExp(X,Y,AmpIn,TauIn,scalingFactor,FitDisplayOn);
+function [A, TAU, exitflag]=biExp(X,Y,AmpIn,TauIn,scalingFactor,FitDisplayOn)
 global gate;
 
 if AmpIn(2)==0
@@ -2768,13 +2768,13 @@ if FitDisplayOn
     hold off;
 end
 
-if exitflag==1,
+if exitflag==1
     Buffer = sprintf('Fit successful NumIterations= %d FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
 else
     Buffer = sprintf('Fit not successful|NumIterations= %d| FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
-end;
+end
 A(1)=parm(1);
 A(2)=parm(3);
 TAU(1)=parm(2);
@@ -2801,7 +2801,7 @@ if displayOn
     delete(h2);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A, TAU, exitflag]=triExp(X,Y,AmpIn,TauIn,scalingFactor,FitDisplayOn);
+function [A, TAU, exitflag]=triExp(X,Y,AmpIn,TauIn,scalingFactor,FitDisplayOn)
 global gate;
 
 lb=[0 0 0 0 0 0];
@@ -2828,13 +2828,13 @@ if FitDisplayOn
     hold off;
 end
 
-if exitflag==1,
+if exitflag==1
     Buffer = sprintf('Fit successful NumIterations= %d FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
 else
     Buffer = sprintf('Fit not successful|NumIterations= %d| FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
-end;
+end
 
 A(1)=parm(1);
 A(2)=parm(3);
@@ -2867,7 +2867,7 @@ if displayOn
     delete(h2);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [beta, TAU, exitflag]=stretchExp(X,Y,scalingFactor,TauIn,FitDisplayOn);
+function [beta, TAU, exitflag]=stretchExp(X,Y,scalingFactor,TauIn,FitDisplayOn)
 
 betaIn=1;
 Tau_KWW_In=TauIn*betaIn/(gamma(1/betaIn));
@@ -2896,13 +2896,13 @@ if FitDisplayOn
     hold off;
 end
 
-if exitflag==1,
+if exitflag==1
     Buffer = sprintf('Fit successful NumIterations= %d FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
 else
     Buffer = sprintf('Fit not successful|NumIterations= %d| FitMethod=%s',output.iterations,output.algorithm)
     output_text(Buffer);
-end;
+end
 beta=parm(1);
 TAU=parm(2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2934,7 +2934,7 @@ if displayOn
     delete(h2);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [beta, TAU]=stretchExpImage(X,Y,TauIn,scalingFactor);
+function [beta, TAU]=stretchExpImage(X,Y,TauIn,scalingFactor)
 
 betaIn=1;
 Tau_KWW_In=TauIn*betaIn/(gamma(1/betaIn));
@@ -2989,7 +2989,7 @@ TAU=(Tau_KWW.*gamma(1./beta))./beta;
 % end
 % TAU=(Tau_KWW.*gamma(1./beta))./beta;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A1, A2, TAU1, TAU2, exitflag]=biExpImage(X,Y,Amp1_In,Tau1_In,Amp2_In,Tau2_In,scalingFactor);
+function [A1, A2, TAU1, TAU2, exitflag]=biExpImage(X,Y,Amp1_In,Tau1_In,Amp2_In,Tau2_In,scalingFactor)
 global gate;
 
 lb=[0 0 0 0];
@@ -3195,14 +3195,14 @@ global ThresholdON;
 
 
 optAoi=get(handles.FitAoiSelection,'Value');
-if optAoi==1,
+if optAoi==1
     [firstCol,lastCol,firstRow,lastRow]=getSingleData;
-elseif optAoi==2,
+elseif optAoi==2
     firstCol=str2num(get(handles.fitAoiFirstCol,'String'));
     lastCol=str2num(get(handles.fitAoiLastCol,'String'));
     firstRow=str2num(get(handles.fitAoiFirstRow,'String'));
     lastRow=str2num(get(handles.fitAoiLastRow,'String'));
-elseif optAoi==3,
+elseif optAoi==3
     firstCol=1;
     lastCol=size(Y,2);
     firstRow=1;
@@ -3215,7 +3215,7 @@ if FilterSize>0
     for i=1:size(Y_Image,3)        
         Y_Image(:,:,i)=imfilter(Y_Image(:,:,i),fspecial('gaussian',[FilterSize FilterSize],0.5));        
     end
-end;
+end
 
 IMG=Y_Image(:,:,index_Zero);
 if ThresholdON
