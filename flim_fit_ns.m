@@ -32,7 +32,7 @@ gui_State = struct('gui_Name',       mfilename, ...
     'gui_OutputFcn',  @flim_fit_ns_OutputFcn, ...
     'gui_LayoutFcn',  [], ...
     'gui_Callback',   []);
-if nargin & isstr(varargin{1})
+if nargin & isstring(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
 
@@ -302,7 +302,7 @@ CMap = StringCM{ValueCM};
 colormap(brighten(eval(CMap),Beta));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press in HistButton.
-function HistButton_Callback(hObject, eventdata, handles)
+function HistButton_Callback(hObject, eventdata, handles) %#ok<*INUSD>
 % hObject    handle to HistButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1084,10 +1084,10 @@ end
 for i=1:selectionNum
     NumPoint(i) = (lastCol(i)-firstCol(i)+1) * (lastRow(i)-firstRow(i)+1);
     temp=Y_THR(firstRow(i):lastRow(i),firstCol(i):lastCol(i),:);
-    vettore_m=squeeze(nanmean(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)])));
+    vettore_m=squeeze(mean(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)]),"omitmissing"));
     Y_Single(i,:)=vettore_m;
 
-    vettore_s=squeeze(nanstd(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)])));
+    vettore_s=squeeze(std(reshape(temp,[1 size(temp,1)*size(temp,2) size(temp,3)]),"omitmissing"));
     Y_Single_std(i,:)=vettore_s;
 end
 axes(handles.plotAxes);
