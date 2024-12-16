@@ -15,6 +15,7 @@ classdef Decay <handle
         bi_fitopts
         bi_gof
         bi_curve
+        indexes
     end
 
     methods
@@ -24,6 +25,7 @@ classdef Decay <handle
             decay.spectra=[];
             decay.spectra_Bands=[];
             decay.CW=[];
+            decay.indexes=[];
             decay.tri_fitopts=fitoptions( 'Method', 'NonlinearLeastSquares' );
             decay.tri_fitopts.Display = 'Off';
             decay.tri_fitopts.TolFun = 1e-07;
@@ -41,6 +43,7 @@ classdef Decay <handle
             self.spectra_Bands=[self.spectra_Bands; image.spectrum_banded];
             if isempty(self.CW)
                 self.CW=image.spectrum_bin8;
+                self.indexes = [1 size(image.data,1)];
             end
             self.CW = self.CW + image.spectrum_bin8;
             [self.tri_fit, self.bi_fit] = deal(cell(1, size(self.spectra_Bands,2)));
@@ -61,7 +64,17 @@ classdef Decay <handle
         function normalise(self, normalisation_point)
             self.spectra_Bands_norm=self.spectra_Bands./self.spectra_Bands(normalisation_point,:);
         end
+
+        function yCrop(self, y1, y2, efficiency)
+            for i = 1:size(self.delays,1)
+                self.images(i).yCrop(y1, y2, efficiency);
+                self.spectra(i,:) = self.images(i).spectrum_bin8;
+            end
+            self.CW = sum(self.spectra);
+        end
+
     end
+
     methods(Static)
         function [fitted, gof, curve, opts]= createTriFit(decay, zero_point)
             delays_shifted=decay.delays-zero_point;

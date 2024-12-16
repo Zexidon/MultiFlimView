@@ -13,6 +13,7 @@ classdef Image <handle
         spectrum_norm
         spectrum_corr_norm
         spectrum_banded
+        indexes
     end
 
     methods
@@ -35,6 +36,7 @@ classdef Image <handle
                 image.spectrum_bin8=interp1(2:2:size(spectrum,2)*2,spectrum,1:336)./(8./image.xbin);
             end
             image.spectrum_norm = image.spectrum_bin8./max(image.spectrum_bin8,[],"all");
+            image.indexes = [1 size(data,1)];
         end
         
         function efficiency(self, efficiency)
@@ -47,6 +49,18 @@ classdef Image <handle
                 self.spectrum_banded(1,j)=sum(self.spectrum_corr(bands(j*2-1):bands(j*2)));
                 self.spectrum_banded(all(~self.spectrum_banded(1,j),1))=[];
             end
+        end
+
+        function yCrop(self, y1, y2, efficiency)
+            spectrum=sum(self.dataCorrected(y1:y2,:));
+            if self.xbin<=8
+                self.spectrum_bin8=sum(reshape(spectrum,(2688/self.xbin)/336,336),1);
+            else
+                self.spectrum_bin8=interp1(2:2:size(spectrum,2)*2,spectrum,1:336)./(8./self.xbin);
+            end
+            self.spectrum_norm = self.spectrum_bin8./max(self.spectrum_bin8,[],"all");
+            self.spectrum_corr = self.spectrum_bin8./efficiency;
+            self.spectrum_corr_norm = self.spectrum_corr./max(self.spectrum_corr,[],"all");
         end
 
     end
